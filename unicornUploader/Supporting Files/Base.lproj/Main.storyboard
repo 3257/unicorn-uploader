@@ -50,8 +50,12 @@
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                             </button>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="unicorn" translatesAutoresizingMaskIntoConstraints="NO" id="BQj-t4-Ilo">
+                            <imageView contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="unicorn" translatesAutoresizingMaskIntoConstraints="NO" id="BQj-t4-Ilo">
                                 <rect key="frame" x="40" y="234" width="295" height="283"/>
+                                <gestureRecognizers/>
+                                <connections>
+                                    <outletCollection property="gestureRecognizers" destination="Vsa-lL-0ZX" appends="YES" id="qsO-ST-NBK"/>
+                                </connections>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -78,6 +82,11 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="DeR-zR-LpV" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="Vsa-lL-0ZX">
+                    <connections>
+                        <action selector="didTapImageView:" destination="mR4-XC-cLy" id="0hr-DU-2Ew"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="2543.1999999999998" y="141.67916041979012"/>
         </scene>

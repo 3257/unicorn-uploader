@@ -10,6 +10,15 @@ import UIKit
 
 class UnicornsTableViewController: UITableViewController {
 
+    // MARK: - Variables
+    var unicorns = [Unicorn]() {
+        didSet {
+            tableView.reloadData()
+        }
+    }
+
+
+    // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -22,14 +31,12 @@ extension UnicornsTableViewController {
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 0
+        return unicorns.count
     }
 
-
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "unicornTableViewCell", for: indexPath)
-        // Configure the cell...
+        let cell = tableView.dequeueReusableCell(withIdentifier: "unicornTableViewCell", for: indexPath) as! UnicornTableViewCell
+        cell.unicorn = unicorns[indexPath.row]
         return cell
     }
 }
