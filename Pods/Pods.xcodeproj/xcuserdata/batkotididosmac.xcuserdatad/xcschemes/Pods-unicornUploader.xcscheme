@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E464D54C7648E89DE135AC86C49D5290"
+               BlueprintIdentifier = "4281C32D272BD8F152EE67798948A0BB"
                BuildableName = "Pods_unicornUploader.framework"
                BlueprintName = "Pods-unicornUploader"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -45,7 +45,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E464D54C7648E89DE135AC86C49D5290"
+            BlueprintIdentifier = "4281C32D272BD8F152EE67798948A0BB"
             BuildableName = "Pods_unicornUploader.framework"
             BlueprintName = "Pods-unicornUploader"
             ReferencedContainer = "container:Pods.xcodeproj">
