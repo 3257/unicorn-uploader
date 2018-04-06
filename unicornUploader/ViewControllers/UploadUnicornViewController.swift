@@ -22,7 +22,9 @@ class UploadUnicornViewController: UIViewController {
     @IBAction func didTapSubmit(_ sender: UIButton) {
         let addedBy = self.addedBy.text ?? ""
         let seenAt = self.seenAt.text ?? ""
-        ref.child("unicorns").child(seenAt + "\(Int(Date.timeIntervalSinceReferenceDate * 1000))").setValue(Unicorn(imagePath: storageImagePath, addedBy: addedBy, seenAt: seenAt).toAnyObject())
+        let unicorn = Unicorn(imagePath: storageImagePath, addedBy: addedBy, seenAt: seenAt)
+
+        ref.child("unicorns").child(seenAt + "\(Int(Date.timeIntervalSinceReferenceDate * 1000))").setValue(unicorn.toAnyObject())
         navigationController?.popViewController(animated: true)
     }
 
@@ -42,6 +44,12 @@ class UploadUnicornViewController: UIViewController {
     var ref: DatabaseReference!
     var storageRef: StorageReference!
     var storageUploadTask: StorageUploadTask!
+
+    var showNetworkActivityIndicator = false {
+        didSet {
+            UIApplication.shared.isNetworkActivityIndicatorVisible = showNetworkActivityIndicator
+        }
+    }
 
     // MARK: - Functions
     func uploadSuccess(_ metadata: StorageMetadata, _ storagePath: String, _ storageImage: UIImage) {
@@ -65,28 +73,34 @@ class UploadUnicornViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         if self.isMovingFromParentViewController {
+            showNetworkActivityIndicator = false
             storageUploadTask.cancel()
         }
     }
 }
-
 
 // MARK: - UIImagePickerControllerDelegate, UINavigationControllerDelegate
 extension UploadUnicornViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate  {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         picker.dismiss(animated: true, completion: nil)
 
-        guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage else { return }
-        guard let imageData = UIImageJPEGRepresentation(image, 0.5) else { return }
+        guard let image = info[UIImagePickerControllerOriginalImage] as? UIImage,
+            let imageData = UIImageJPEGRepresentation(image, 0.5) else {
+                print("Could not get Image JPEG Representation")
+                return
+        }
 
         let imagePath = Auth.auth().app!.options.googleAppID + "/\(Int(Date.timeIntervalSinceReferenceDate * 1000)).jpg"
 
         let metadata = StorageMetadata()
         metadata.contentType = "image/jpeg"
 
+        showNetworkActivityIndicator = true
+
         storageUploadTask = self.storageRef.child(imagePath).putData(imageData, metadata: metadata) { (metadata, error) in
-            if let error = error {
-                print("Error uploading: \(error)")
+            self.showNetworkActivityIndicator = false
+            guard error == nil else {
+                print("Error uploading: \(error!)")
                 return
             }
             self.uploadSuccess(metadata!, imagePath, image)
