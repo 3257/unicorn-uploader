@@ -7,20 +7,45 @@
 //
 
 import UIKit
+import FirebaseDatabase
+import FirebaseAuth
+import FirebaseStorage
 
 class UnicornsTableViewController: UITableViewController {
 
     // MARK: - Variables
+    var ref: DatabaseReference!
+    var firebaseHandle: UInt!
+    
     var unicorns = [Unicorn]() {
         didSet {
             tableView.reloadData()
         }
     }
 
-
     // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        ref = Database.database().reference()
+        // Hide separators for empty cells
+        tableView.tableFooterView = UIView()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        firebaseHandle = ref.child("unicorns").observe(.value) { snapshot in
+            var unicorns = [Unicorn]()
+            for unicornSnapshot in snapshot.children {
+                let unicorn = Unicorn(snapshot: unicornSnapshot as! DataSnapshot)
+                unicorns.append(unicorn)
+            }
+            self.unicorns = unicorns
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        ref.removeObserver(withHandle: firebaseHandle)
     }
 }
 
