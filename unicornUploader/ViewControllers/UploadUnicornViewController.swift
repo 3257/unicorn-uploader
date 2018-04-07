@@ -24,7 +24,9 @@ class UploadUnicornViewController: UIViewController {
         let seenAt = self.seenAt.text ?? ""
         let unicorn = Unicorn(imagePath: storageImagePath, addedBy: addedBy, seenAt: seenAt)
 
-        ref.child("unicorns").child(seenAt + "\(Int(Date.timeIntervalSinceReferenceDate * 1000))").setValue(unicorn.toAnyObject())
+        writeUnicornToDatabase(unicorn)
+
+        // Return to Unicorns Table VC
         navigationController?.popViewController(animated: true)
     }
 
@@ -39,24 +41,32 @@ class UploadUnicornViewController: UIViewController {
     }
 
     // MARK: - Variables
-    let picker = UIImagePickerController()
-    var storageImagePath = ""
-    var ref: DatabaseReference!
-    var storageRef: StorageReference!
-    var storageUploadTask: StorageUploadTask!
+    fileprivate let picker = UIImagePickerController()
+    fileprivate var storageImagePath = ""
+    fileprivate var ref: DatabaseReference!
+    fileprivate var storageRef: StorageReference!
+    fileprivate var storageUploadTask: StorageUploadTask!
 
-    var showNetworkActivityIndicator = false {
+    // Setup for activity indicator to be shown when uploading image
+    fileprivate var showNetworkActivityIndicator = false {
         didSet {
             UIApplication.shared.isNetworkActivityIndicatorVisible = showNetworkActivityIndicator
         }
     }
 
     // MARK: - Functions
-    func uploadSuccess(_ metadata: StorageMetadata, _ storagePath: String, _ storageImage: UIImage) {
-        print("Upload Succeeded!")
+    fileprivate func writeUnicornToDatabase(_ unicorn: Unicorn) {
+        ref.child("unicorns").child(unicorn.seenAt + "\(Int(Date.timeIntervalSinceReferenceDate * 1000))").setValue(unicorn.toAnyObject())
+    }
+
+    fileprivate func uploadSuccess(_ metadata: StorageMetadata, _ storagePath: String, _ storageImage: UIImage) {
+
+        // Shpw updated image for unicorn
         unicornImageView.image = storageImage
+        // Updated path for image
         storageImagePath = storagePath
 
+        // Enable submit button and change its color
         submitButton.isEnabled = true
         submitButton.backgroundColor = .green
     }
@@ -64,17 +74,23 @@ class UploadUnicornViewController: UIViewController {
     // MARK: - View Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        // Setup references for database and for storage
         ref = Database.database().reference()
         storageRef = Storage.storage().reference()
+
+        // Submit button should be disable initially
         submitButton.isEnabled = false
         submitButton.backgroundColor = .gray
+
         picker.delegate = self
     }
+
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        // If VC is popping, stop showing networking activity indicator and cancel storageUploadTask if any
         if self.isMovingFromParentViewController {
             showNetworkActivityIndicator = false
-            storageUploadTask.cancel()
+            storageUploadTask?.cancel()
         }
     }
 }

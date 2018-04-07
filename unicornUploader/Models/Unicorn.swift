@@ -10,30 +10,26 @@ import Foundation
 import FirebaseDatabase
 
 struct Unicorn {
-    let key: String
-    let ref: DatabaseReference?
     let imagePath: String
     let addedBy: String
     let seenAt: String
 
-    init(key: String = "", ref: DatabaseReference? = nil, imagePath: String, addedBy: String, seenAt: String) {
-        self.key = key
-        self.ref = ref
+    // Standard init
+    init(imagePath: String, addedBy: String, seenAt: String) {
         self.imagePath = imagePath
         self.addedBy = addedBy
         self.seenAt = seenAt
     }
 
+    // Init for reading from Database snapshot
     init(snapshot: DataSnapshot) {
-        key = snapshot.key
-        ref = snapshot.ref
-
         let snapshotValue = snapshot.value as! [String: AnyObject]
         imagePath = snapshotValue["imagePath"] as! String
         addedBy = snapshotValue["addedBy"] as! String
         seenAt = snapshotValue["seenAt"] as! String
     }
 
+    // Func converting model for easier writing to database
     func toAnyObject() -> Any {
         return [
             "imagePath": imagePath,
