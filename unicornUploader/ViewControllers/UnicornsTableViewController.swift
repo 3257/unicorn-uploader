@@ -15,7 +15,6 @@ class UnicornsTableViewController: UITableViewController {
 
     // MARK: - Variables
     var ref: DatabaseReference!
-    var firebaseHandle: UInt!
     
     var unicorns = [Unicorn]() {
         didSet {
@@ -33,7 +32,7 @@ class UnicornsTableViewController: UITableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        firebaseHandle = ref.child("unicorns").observe(.value) { snapshot in
+        ref.child("unicorns").observe(.value) { snapshot in
             var unicorns = [Unicorn]()
             for unicornSnapshot in snapshot.children {
                 let unicorn = Unicorn(snapshot: unicornSnapshot as! DataSnapshot)
@@ -41,11 +40,6 @@ class UnicornsTableViewController: UITableViewController {
             }
             self.unicorns = unicorns
         }
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        ref.removeObserver(withHandle: firebaseHandle)
     }
 }
 
