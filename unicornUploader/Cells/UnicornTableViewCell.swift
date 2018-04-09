@@ -28,33 +28,39 @@ class UnicornTableViewCell: UITableViewCell {
         }
     }
 
-    func downloadImage(from storagePath: String) {
+    func downloadImage(from storageImagePath: String) {
+        // 1. Get a filePath to save the image at
         let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
         let documentsDirectory = paths[0]
         let filePath = "file:\(documentsDirectory)/myimage.jpg"
+        // 2. Get the url of that file path
         guard let fileURL = URL(string: filePath) else { return }
 
-        // Start download of image
-        storageDownloadTask = storageRef.child(storagePath).write(toFile: fileURL, completion: { (url, error) in
+        // 3. Start download of image and write it to the file url
+        storageDownloadTask = storageRef.child(storageImagePath).write(toFile: fileURL, completion: { (url, error) in
+            // 4. Check for error
             if let error = error {
                 print("Error downloading:\(error)")
                 return
+                // 5. Get the url path of the image
             } else if let imagePath = url?.path {
+                // 6. Update the unicornImageView image
                 self.unicornImageView.image = UIImage(contentsOfFile: imagePath)
             }
         })
-        // Finish download of image
+        // 7. Finish download of image
     }
 
     override func awakeFromNib() {
+        super.awakeFromNib()
         storageRef = Storage.storage().reference()
     }
 
     override func prepareForReuse() {
         super.prepareForReuse()
+        storageDownloadTask.cancel()
         unicornImageView.image = #imageLiteral(resourceName: "unicorn")
         addedBy.text = "Added by"
         seenAt.text = "Seen at"
-        storageDownloadTask.cancel()
     }
 }
